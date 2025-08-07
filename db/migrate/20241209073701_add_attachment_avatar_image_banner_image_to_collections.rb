@@ -1,10 +1,8 @@
 class AddAttachmentAvatarImageBannerImageToCollections < ActiveRecord::Migration[7.1]
   def self.up
-    safety_assured do
-      change_table :patchwork_collections do |t|
-        t.attachment :avatar_image
-        t.attachment :banner_image
-      end
+    change_table :patchwork_collections do |t|
+      t.attachment :avatar_image
+      t.attachment :banner_image
     end
   end
 
