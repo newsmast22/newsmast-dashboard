@@ -1,6 +1,6 @@
 class CreateAppVersions < ActiveRecord::Migration[7.1]
   def change
-    create_table :patchwork_app_versions do |t|
+    create_table :patchwork_app_versions, if_not_exists: true do |t|
       t.string :version_name
       t.timestamps
     end
