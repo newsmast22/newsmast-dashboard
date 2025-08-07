@@ -1,6 +1,6 @@
 class CreatePatchworkAccountCommunityAmplifier < ActiveRecord::Migration[7.1]
   def change
-    create_table :patchwork_community_amplifiers do |t|
+    create_table :patchwork_community_amplifiers, if_not_exists: true do |t|
       t.references :account, null: false, foreign_key: true
       t.references :patchwork_community, null: false, foreign_key: true
       t.jsonb :amplifier_settings, null: false, default: {}

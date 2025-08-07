@@ -1,6 +1,6 @@
 class CreatePatchworkCommunitiesHashtags < ActiveRecord::Migration[7.1]
   def change
-    create_table :patchwork_communities_hashtags do |t|
+    create_table :patchwork_communities_hashtags, if_not_exists: true do |t|
       t.references :patchwork_community, null: false, foreign_key: true
       t.string :hashtag
       t.string :name

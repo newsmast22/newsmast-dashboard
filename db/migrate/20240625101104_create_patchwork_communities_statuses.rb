@@ -1,6 +1,6 @@
 class CreatePatchworkCommunitiesStatuses < ActiveRecord::Migration[7.1]
   def change
-    create_table :patchwork_communities_statuses do |t|
+    create_table :patchwork_communities_statuses, if_not_exists: true do |t|
       t.references :status, null: false, foreign_key: true
       t.references :patchwork_community, null: false, foreign_key: true
       t.timestamps
