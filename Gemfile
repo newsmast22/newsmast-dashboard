@@ -69,7 +69,6 @@ gem 'sidekiq-scheduler', '~> 5.0'
 gem "cocoon"
 
 gem "select2-rails"
-gem "strong_migrations"
 gem 'ransack'
 gem 'bcrypt'
 gem 'faraday', '~> 2.10', '>= 2.10.1'
