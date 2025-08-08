@@ -19,7 +19,7 @@ module Api
 			private
 		
 				def set_app_version
-					key = app_version_params[:app_name]&.to_sym || :patchwork
+					key = app_version_params[:app_name]&.to_sym || :newsmast
  					app_name = AppVersion.app_names[key] || AppVersion.app_names[:patchwork]
 					@app_version = AppVersion.find_by(
 						version_name: app_version_params[:current_app_version],
