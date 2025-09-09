@@ -425,28 +425,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_02_101613) do
     t.index ["account_id"], name: "index_custom_filters_on_account_id"
   end
 
-  create_table "deprecated_preview_cards", force: :cascade do |t|
-    t.bigint "status_id"
-    t.string "url", default: "", null: false
-    t.string "title"
-    t.string "description"
-    t.string "image_file_name"
-    t.string "image_content_type"
-    t.bigint "image_file_size"
-    t.datetime "image_updated_at", precision: nil
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.integer "type", default: 0, null: false
-    t.text "html", default: "", null: false
-    t.string "author_name", default: "", null: false
-    t.string "author_url", default: "", null: false
-    t.string "provider_name", default: "", null: false
-    t.string "provider_url", default: "", null: false
-    t.integer "width", default: 0, null: false
-    t.integer "height", default: 0, null: false
-    t.index ["status_id"], name: "index_deprecated_preview_cards_on_status_id", unique: true
-  end
-
   create_table "domain_allows", force: :cascade do |t|
     t.string "domain", default: "", null: false
     t.datetime "created_at", precision: nil, null: false
@@ -474,6 +452,32 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_02_101613) do
     t.bigint "parent_id"
     t.boolean "allow_with_approval", default: false, null: false
     t.index ["domain"], name: "index_email_domain_blocks_on_domain", unique: true
+  end
+
+  create_table "fasp_debug_callbacks", force: :cascade do |t|
+    t.bigint "fasp_provider_id", null: false
+    t.string "ip", null: false
+    t.text "request_body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fasp_provider_id"], name: "index_fasp_debug_callbacks_on_fasp_provider_id"
+  end
+
+  create_table "fasp_providers", force: :cascade do |t|
+    t.boolean "confirmed", default: false, null: false
+    t.string "name", null: false
+    t.string "base_url", null: false
+    t.string "sign_in_url"
+    t.string "remote_identifier", null: false
+    t.string "provider_public_key_pem", null: false
+    t.string "server_private_key_pem", null: false
+    t.jsonb "capabilities", default: [], null: false
+    t.jsonb "privacy_policy"
+    t.string "contact_email"
+    t.string "fediverse_account"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["base_url"], name: "index_fasp_providers_on_base_url", unique: true
   end
 
   create_table "favourites", force: :cascade do |t|
@@ -1178,6 +1182,24 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_02_101613) do
     t.string "url"
   end
 
+  create_table "quotes", id: :bigint, default: -> { "timestamp_id('quotes'::text)" }, force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "status_id", null: false
+    t.bigint "quoted_status_id"
+    t.bigint "quoted_account_id"
+    t.integer "state", default: 0, null: false
+    t.string "approval_uri"
+    t.string "activity_uri"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "quoted_account_id"], name: "index_quotes_on_account_id_and_quoted_account_id"
+    t.index ["activity_uri"], name: "index_quotes_on_activity_uri", unique: true, where: "(activity_uri IS NOT NULL)"
+    t.index ["approval_uri"], name: "index_quotes_on_approval_uri", where: "(approval_uri IS NOT NULL)"
+    t.index ["quoted_account_id"], name: "index_quotes_on_quoted_account_id"
+    t.index ["quoted_status_id"], name: "index_quotes_on_quoted_status_id"
+    t.index ["status_id"], name: "index_quotes_on_status_id", unique: true
+  end
+
   create_table "relationship_severance_events", force: :cascade do |t|
     t.integer "type", null: false
     t.string "target_name", null: false
@@ -1433,6 +1455,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_02_101613) do
     t.float "max_score"
     t.datetime "max_score_at", precision: nil
     t.string "display_name"
+    t.boolean "is_banned", default: false
     t.index "lower((name)::text) text_pattern_ops", name: "index_tags_on_name_lower_btree", unique: true
   end
 
@@ -1443,6 +1466,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_02_101613) do
     t.datetime "notification_sent_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.date "effective_date", null: false
   end
 
   create_table "tombstones", force: :cascade do |t|
@@ -1616,8 +1640,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_02_101613) do
   add_foreign_key "custom_filter_statuses", "custom_filters", on_delete: :cascade
   add_foreign_key "custom_filter_statuses", "statuses", on_delete: :cascade
   add_foreign_key "custom_filters", "accounts", on_delete: :cascade
-  add_foreign_key "deprecated_preview_cards", "statuses", on_delete: :cascade
   add_foreign_key "email_domain_blocks", "email_domain_blocks", column: "parent_id", on_delete: :cascade
+  add_foreign_key "fasp_debug_callbacks", "fasp_providers"
   add_foreign_key "favourites", "accounts", name: "fk_5eb6c2b873", on_delete: :cascade
   add_foreign_key "favourites", "statuses", name: "fk_b0e856845e", on_delete: :cascade
   add_foreign_key "featured_tags", "accounts", on_delete: :cascade
